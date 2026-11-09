@@ -34,7 +34,7 @@ On **EVERY participating simulator**, keep existing voice settings and configure
 ConferenceApiUrl = https://YOUR-CONFERENCE-HOST.example/adhocconf/wolf_api.php
 ~~~
 
-The BloodMoon-hosted endpoint (https://bloodmoonpack.com/adhocconf/wolf_api.php) is restricted to explicitly authorized trusted simulators; it is not a public conference API. Independently hosted grids require their **own** PHP/MySQL endpoint and authorization.
+The BloodMoon production endpoint is restricted to explicitly authorized trusted simulators; it is not a public conference API. The example.org address above is a placeholder, not a working endpoint. Independently hosted grids require their **own** PHP/MySQL endpoint and authorization.
 
 Restart each updated simulator, then test proximity audio, private voice, multi-avatar text invitations and optional voice across two different simulators. Each participating simulator must have BOTH the matched .3 DLLs and ConferenceApiUrl.
 
