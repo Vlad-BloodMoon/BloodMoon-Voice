@@ -2,11 +2,11 @@
 #
 # wolfvoice installer.
 #
-#   curl -fsSL https://raw.githubusercontent.com/Vlad-BloodMoon/wolfvoice/main/setup.sh | sudo bash
+#   curl -fsSL https://raw.githubusercontent.com/Vlad-BloodMoon/BloodMoon-Voice/main/setup.sh | sudo bash
 #
 # or, to see what it will do first (recommended):
 #
-#   curl -fsSLO https://raw.githubusercontent.com/Vlad-BloodMoon/wolfvoice/main/setup.sh
+#   curl -fsSLO https://raw.githubusercontent.com/Vlad-BloodMoon/BloodMoon-Voice/main/setup.sh
 #   less setup.sh && sudo bash setup.sh
 #
 # What it does:
@@ -25,11 +25,11 @@
 
 set -euo pipefail
 
-REPO="Vlad-BloodMoon/wolfvoice"
+REPO="Vlad-BloodMoon/BloodMoon-Voice"
 # Pin the BloodMoon-validated server release (binary unchanged since bloodmoon.2).
 # This script installs ONLY the server; OpenSimulator DLLs and conference API
 # are separate, and hosted BloodMoon access requires operator authorization.
-RELEASE_TAG="v0.2.0-bloodmoon.4"
+RELEASE_TAG="v1.0.0"
 PREFIX="${PREFIX:-/usr/local/bin}"
 CONFDIR="/etc/wolfvoice"
 TLSDIR="$CONFDIR/tls"
@@ -55,7 +55,7 @@ case "$os:$arch" in
     Linux:x86_64)              assets="wolfvoice-x86_64-linux-musl wolfvoice-x86_64-linux-gnu" ;;
     Linux:aarch64|Linux:arm64) assets="wolfvoice-aarch64-linux-musl wolfvoice-aarch64-linux-gnu" ;;
     *) die "no prebuilt binary for $os/$arch — build from source:
-    git clone https://github.com/$REPO && cd wolfvoice && cargo build --release
+    git clone https://github.com/$REPO && cd BloodMoon-Voice && cargo build --release
   (needs a Rust toolchain and cmake; macOS and Windows are build-from-source
    only, see .github/workflows/release.yml for why)" ;;
 esac
@@ -243,7 +243,7 @@ wolfvoice is installed. Signing keys have NOT been created by this installer.
    Never overwrite an existing key or include a key in a public download.
 
    Matching DLL/PDB package:
-   https://github.com/Vlad-BloodMoon/opensim/releases/tag/v0.9.3.1-webrtc.3
+   https://github.com/$REPO/releases/download/$RELEASE_TAG/WebRTC_Modules_BloodMoon_0.9.3.1-webrtc.3.zip
    Download the complete BloodMoon WebRTC module ZIP (3 DLL/PDB pairs).
    Configure bin/config/wolfvoice.ini with your voice hostname and key file paths.
    For BloodMoon-managed ad-hoc conferences only, add in [WebRtcVoice]:
