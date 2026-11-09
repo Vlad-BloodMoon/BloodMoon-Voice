@@ -178,7 +178,7 @@ The features validated on BloodMoon (7 Nov 2026): private IM voice, standard Ope
 1. Prepare an HTTPS web host running PHP 8.3+ with PDO MySQL and a compatible MySQL 8 database.
 2. From the AdHoc repository deploy **`web/wolf_api.php`**, create a private `wolf_config.php` using **`web/wolf_config.php.example`**, and import **`database/wolf_schema.sql`** into a separate database. Do **not** use the older prototype `web/conferences.php` or `database/schema.sql`.
 3. Create a restricted MySQL account. Set the DSN, credentials, existing voice credential key path and session limits in the private PHP configuration. Restrict file access and HTTP access to configuration files.
-4. **Important independent-install prerequisite:** the PHP currently checks `wolfvoice_admin.servers` with `status='allowed'` for permitted simulator IPs. Supply a compatible trusted-server registry and narrowly scoped read permissions, **or adapt the PHP allowlist logic for your own infrastructure**. Without this dependency, the current backend cannot be deployed as-is.
+4. **Standalone installations:** configure `'authorization_source' => 'local'` in `wolf_config.php` and populate `trusted_simulator_ips` with the **actual public egress IP addresses** of permitted simulators. This mode does not require BloodMoon's `wolfvoice_admin.servers` table. The historical `bloodmoon_db` setting is retained for BloodMoon's existing database-based allowlist. An empty local list denies all requests.
 5. Publish `wolf_api.php` over HTTPS. The API expects authenticated signed POST requests; merely loading it in a browser is not a successful functional test.
 6. In `[WebRtcVoice]` on **every participating simulator**, configure your **own** API hostname:
 
