@@ -1,0 +1,49 @@
+name: Update BloodMoon Voice bilingual release instructions
+
+on:
+  push:
+    paths:
+      - .github/workflows/publish-bilingual-release-notes.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  notes:
+    if: github.repository == 'Vlad-BloodMoon/BloodMoon-Voice'
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish bilingual overview without altering release assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo '# BloodMoon Voice v1.0.0 — WebRTC for OpenSimulator'
+            echo
+            echo '## Français'
+            echo
+            echo '**BloodMoon Voice** fournit la voix 3D de proximité, les appels privés en IM, les appels vocaux des groupes OpenSimulator, les conférences IM entre plusieurs avatars et leurs appels vocaux facultatifs, même entre plusieurs simulateurs. Les participants peuvent raccrocher et revenir dans l’audio sans quitter le texte.'
+            echo
+            echo '[Fonctionnalités complètes](https://github.com/Vlad-BloodMoon/BloodMoon-Voice/blob/main/README.fr.md) · [Installation intégrale pas à pas](https://github.com/Vlad-BloodMoon/BloodMoon-Voice/blob/main/docs/INSTALLATION_FR.md) · [Installation de l’API AdHoc](https://github.com/Vlad-BloodMoon/OpenSimulator-AdHocConferences/blob/main/docs/INSTALLATION.fr.md)'
+            echo
+            echo 'Le serveur vocal, les trois paires DLL/PDB de la release OpenSimulator **v0.9.3.1-webrtc.3** et le service central PHP/MySQL AdHoc sont trois éléments différents. L’API doit être installée séparément. L’adresse d’exemple doit être remplacée par votre propre domaine. Ne pas remplacer la DLL régionale .3 par une ancienne DLL AdHoc.'
+            echo
+            echo '## English'
+            echo
+            echo '**BloodMoon Voice** provides 3D proximity audio, private IM calls, regular OpenSimulator group voice, multi-avatar IM conferences and optional conference calls, including across separate simulator processes. Participants can hang up and rejoin audio while keeping the text chat open.'
+            echo
+            echo '[Full feature list](https://github.com/Vlad-BloodMoon/BloodMoon-Voice/blob/main/README.md) · [End-to-end installation](https://github.com/Vlad-BloodMoon/BloodMoon-Voice/blob/main/docs/INSTALLATION.md) · [Independent AdHoc PHP/MySQL setup](https://github.com/Vlad-BloodMoon/OpenSimulator-AdHocConferences/blob/main/docs/INSTALLATION.md)'
+            echo
+            echo 'Install the voice server, exactly the three matching DLL/PDB pairs from OpenSimulator **v0.9.3.1-webrtc.3**, and separately host the AdHoc PHP/MySQL conference registry. Replace every example URL with your own HTTPS service. Do not overwrite the tested .3 regional DLL with an older standalone AdHoc module.'
+            echo
+            echo '## Download notes / Notes de téléchargement'
+            echo
+            echo 'The validated server binary and OpenSimulator DLL/PDB packages are preserved. The separate **BloodMoon-Voice-installer-v1.0.0.tar.gz** is the installer for new deployments; the original older archive remains for provenance. Keys and your own PHP/MySQL API are not bundled.'
+            echo
+            echo 'Original project: [WolfVoice](https://github.com/intelligentwolf/wolfvoice); BloodMoon modifications and testing. Preserve license and attribution.'
+          } > notes.md
+          gh release edit v1.0.0 --repo "$GITHUB_REPOSITORY" --notes-file notes.md
