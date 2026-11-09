@@ -64,7 +64,7 @@ sudo apt-get update
 sudo apt-get install -y curl ca-certificates openssl python3
 mkdir -p "$HOME/wolfvoice-installation"
 cd "$HOME/wolfvoice-installation"
-curl -fL https://github.com/Vlad-BloodMoon/BloodMoon-Voice/releases/download/v1.0.0/wolfvoice-installation-bloodmoon.4.tar.gz -o wolfvoice-installation.tar.gz
+curl -fL https://github.com/Vlad-BloodMoon/BloodMoon-Voice/releases/download/v1.0.0/BloodMoon-Voice-installer-v1.0.0.tar.gz -o wolfvoice-installation.tar.gz
 mkdir -p source
 tar -xzf wolfvoice-installation.tar.gz -C source
 cd source
