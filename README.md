@@ -12,7 +12,7 @@ Source tree SHA-1: `6da740f1b1d08f4a108f8d9d0fd1a4a95e7645f5`.
 
 The baseline includes the Rust voice server source, client code, example configs, installer scripts, CI workflows, documentation, tests, `LICENSE` and `NOTICE`.
 
-The original release has **9 downloadable assets**, including a Linux x86-64 server binary, the OpenSimulator 0.9.3.1 module ZIP, and checksum files. Their republication is managed by the import workflow at `.github/workflows/import-bloodmoon-release.yml`. **If the new release has not appeared yet, download the original files from the source release page.** Do not assume the ZIP modules are present in the source tree.
+The [BloodMoon Voice v1.0.0 release](https://github.com/Vlad-BloodMoon/BloodMoon-Voice/releases/tag/v1.0.0) includes the **9 original verified release assets** (Linux x86-64 server binary, OpenSimulator 0.9.3.1 modules and checksums) **plus a new BloodMoon Voice installer archive and its SHA-256**. The original 9 files remain unchanged.\n\n**For new installations:** [download the BloodMoon Voice installer archive](https://github.com/Vlad-BloodMoon/BloodMoon-Voice/releases/download/v1.0.0/BloodMoon-Voice-installer-v1.0.0.tar.gz) and follow the [French guide](docs/INSTALLATION_FR.md) or [English guide](docs/INSTALLATION.md). The older `wolfvoice-installation-bloodmoon.4.tar.gz` is preserved as a historical archive and still contains original WolfVoice repository links. Do not assume the ZIP modules are present in the Git source tree.
 
 ## Features and prerequisites
 
