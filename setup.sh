@@ -247,8 +247,8 @@ wolfvoice is installed. Signing keys have NOT been created by this installer.
    Download the complete BloodMoon WebRTC module ZIP (3 DLL/PDB pairs).\n   The correct AdHoc regional DLL is ALREADY in this .3 ZIP; do not replace\n   it with an older standalone AdHoc regional DLL.\n   Independent conference PHP/MySQL API source and installation:\n   https://github.com/Vlad-BloodMoon/OpenSimulator-AdHocConferences
    Configure bin/config/wolfvoice.ini with your voice hostname and key file paths.
    For ad-hoc conferences, configure your OWN PHP/MySQL conference API.\n   On authorized BloodMoon-managed simulators only, use in [WebRtcVoice]:
-     ConferenceApiUrl = https://bloodmoonpack.com/adhocconf/wolf_api.php
-   This conference API is restricted to approved BloodMoon simulators.
+     ConferenceApiUrl = https://conference.example.org/adhocconf/wolf_api.php
+   EXAMPLE URL ONLY: replace with your own deployed conference PHP/MySQL API.\n   The BloodMoon production API is not a public endpoint.
    Other independent grids need their OWN conference registry and endpoint.
    Install the SAME key contents privately on the server and region hosts.
    Restart wolfvoice after creating its keys, then restart the updated regions.
