@@ -1,4 +1,4 @@
-# Installation and signing keys
+# BloodMoon Voice — complete English installation guide
 
 **[Guide français pas à pas](INSTALLATION_FR.md) · [Téléchargements compilés](TELECHARGEMENTS_FR.md)**
 
@@ -7,6 +7,29 @@ Precompiled OpenSim 0.9.3.1 DLL/PDB package: [download ZIP](https://github.com/V
 For this fork, the current setup.sh on main installs the BloodMoon Voice v1.0.0 server (same original BloodMoon-validated binary) but does NOT create signing keys, install simulator DLLs, or deploy the conference PHP API. Existing servers using the validated `.2/.3` binary need no server replacement for this feature. Historical source tags retain their original installer; use the current script linked below.
 Create them manually as described below. Never paste a key into a public issue,
 README, screenshot or download archive.
+
+[Overview and features](../README.md) · [French installation](INSTALLATION_FR.md) · [Release v1.0.0](https://github.com/Vlad-BloodMoon/BloodMoon-Voice/releases/tag/v1.0.0)
+
+This guide is for **new OpenSimulator 0.9.3.1 / .NET 8 installations** and for operators who need to understand how to connect all three projects. Do not rerun an installer on a working production voice host merely to update the documentation.
+
+## Overview — the three components
+
+1. **Voice server:** [BloodMoon Voice v1.0.0](https://github.com/Vlad-BloodMoon/BloodMoon-Voice/releases/tag/v1.0.0), a self-hosted modified WebRTC voice server.
+2. **Every simulator:** the **three DLL/PDB pairs** from **[OpenSimulator v0.9.3.1-webrtc.3](https://github.com/Vlad-BloodMoon/opensim/releases/tag/v0.9.3.1-webrtc.3)**. The correct AdHoc regional DLL is already included. Do **not** replace it with an older standalone DLL.
+3. **AdHoc conferences (separately hosted):** the PHP/MySQL service from [OpenSimulator-AdHocConferences](https://github.com/Vlad-BloodMoon/OpenSimulator-AdHocConferences). Basic spatial/private/group voice does not require this API; multi-avatar AdHoc text/voice conferences do.
+
+**Quick start for a new Ubuntu 24.04 Linux x86-64 voice host:** prepare your public IP, a real voice DNS name, TCP 9443 for authorized simulator hosts, UDP 40000–40999 for viewers and TCP 80 for certificate issuance if using Certbot standalone. Back up any existing voice files. Download the [BloodMoon Voice installer archive](https://github.com/Vlad-BloodMoon/BloodMoon-Voice/releases/download/v1.0.0/BloodMoon-Voice-installer-v1.0.0.tar.gz), extract it, review `setup.sh` and run it as root. It installs **only the voice host**, downloads and checks the pinned server binary, configures its service and TLS, but does not install simulator modules, keys or the AdHoc API.
+
+```bash
+mkdir -p "$HOME/bloodmoon-voice-install" && cd "$HOME/bloodmoon-voice-install"
+curl -fL https://github.com/Vlad-BloodMoon/BloodMoon-Voice/releases/download/v1.0.0/BloodMoon-Voice-installer-v1.0.0.tar.gz -o installer.tar.gz
+mkdir source && tar -xzf installer.tar.gz -C source
+cd source
+less setup.sh
+sudo bash setup.sh
+```
+
+The installer asks for your **own** public IP and DNS hostname. Ensure you have reviewed firewall/TLS prerequisites before running it. Then perform the key configuration below, install the matching module ZIP and, only for AdHoc conferences, deploy your own API.
 
 ## 1. Fresh installation or existing installation?
 
@@ -144,17 +167,38 @@ audio in both directions, then hangup and return to local voice.
 
 **Compatibility warning:** the **stock upstream WolfVoice server has not yet integrated the complete BloodMoon spatial-axis/group-voice work**. The tested complete package is for the [BloodMoon WolfVoice server](https://github.com/Vlad-BloodMoon/BloodMoon-Voice/releases/tag/v1.0.0) with the [OpenSim WebRTC module `v0.9.3.1-webrtc.3`](https://github.com/Vlad-BloodMoon/opensim/releases/tag/v0.9.3.1-webrtc.3). Ad-hoc conferences **additionally depend on a separate central conference registry** ([PHP/MySQL source, installation and trust model](https://github.com/Vlad-BloodMoon/OpenSimulator-AdHocConferences)). A standalone server and three DLLs **do not** create a conference registry.
 
-**Only if the simulator has been approved by BloodMoon**: add to its existing `[WebRtcVoice]` section without disturbing server URI/key files:
+**For independent self-hosted conferences:** add your **own** conference API address to the existing `[WebRtcVoice]` section without disturbing server URI/key files:
 
 ```ini
 ConferenceApiUrl = https://conference.example.org/adhocconf/wolf_api.php
 ```
 
-The URL is restricted to trusted, authorized simulator hosts sharing the correct voice credential key. It is **not a public unrestricted API**. For your **own independent grid**, deploy and configure your **own** conference registry and use **your own** URL and key material instead. Do not copy BloodMoon's key onto unknown or untrusted machines. A grid operator holding the shared secret can sign actions for other avatar UUIDs: consider independent per-simulator authorization before federation.
+The `example.org` address above is a fictional placeholder; it is not hosted by BloodMoon and will not work until replaced. Your deployed API must restrict access to authorized trusted simulator hosts sharing the correct voice credential key. For your **own independent grid**, deploy and configure your **own** conference registry and use **your own** URL and key material instead. Do not copy BloodMoon's key onto unknown or untrusted machines. A grid operator holding the shared secret can sign actions for other avatar UUIDs: consider independent per-simulator authorization before federation.
 
 **Both simulators** need the `.3` compatible regional DLL **and** their own `ConferenceApiUrl` line. If the second simulator is missing the line, its residents will not receive multi-avatar IM conference invitations. Restart each updated simulator.
 
 The features validated on BloodMoon (7 Nov 2026): private IM voice, standard OpenSim group calls, multi-avatar **text** IM conferences (without echo), optional conference **voice** across separate simulators, independent audio hang-up and rejoin with other members remaining unaffected.
+
+## 6B. Deploy your own AdHoc conference API (required for ad-hoc conferences)
+
+**Follow this section for an independent self-hosted grid.** Multi-avatar text conferences and optional conference audio need the independent [OpenSimulator-AdHocConferences](https://github.com/Vlad-BloodMoon/OpenSimulator-AdHocConferences) backend. This step is not performed by the voice server installer.
+
+1. Prepare an HTTPS web host running PHP 8.3+ with PDO MySQL and a compatible MySQL 8 database.
+2. From the AdHoc repository deploy **`web/wolf_api.php`**, create a private `wolf_config.php` using **`web/wolf_config.php.example`**, and import **`database/wolf_schema.sql`** into a separate database. Do **not** use the older prototype `web/conferences.php` or `database/schema.sql`.
+3. Create a restricted MySQL account. Set the DSN, credentials, existing voice credential key path and session limits in the private PHP configuration. Restrict file access and HTTP access to configuration files.
+4. **Important independent-install prerequisite:** the PHP currently checks `wolfvoice_admin.servers` with `status='allowed'` for permitted simulator IPs. Supply a compatible trusted-server registry and narrowly scoped read permissions, **or adapt the PHP allowlist logic for your own infrastructure**. Without this dependency, the current backend cannot be deployed as-is.
+5. Publish `wolf_api.php` over HTTPS. The API expects authenticated signed POST requests; merely loading it in a browser is not a successful functional test.
+6. In `[WebRtcVoice]` on **every participating simulator**, configure your **own** API hostname:
+
+```ini
+ConferenceApiUrl = https://conference.example.org/adhocconf/wolf_api.php
+```
+
+**This address is an intentionally non-working example.** Replace the host and path with the actual address of your installed conference API. BloodMoon's production API is private and not available as a public service. Do not reuse its keys.
+
+7. Restart all updated simulators. Verify ad-hoc text and optional voice with participants on the same simulator, then on **different simulators**. The `.3` modules and the API URL must be configured on both ends.
+
+For database, PHP and trust-model details, see the dedicated [AdHoc English deployment guide](https://github.com/Vlad-BloodMoon/OpenSimulator-AdHocConferences/blob/main/docs/INSTALLATION.md). The shared-secret model is appropriate only for **trusted simulator operators**; it is not authenticated open federation.
 
 ## 7. Network and common errors
 
