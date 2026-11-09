@@ -55,7 +55,7 @@ Ne pas activer ou réinitialiser UFW à distance sans préserver votre accès SS
 ## 3. Installer le serveur vocal
 
 **Sur la machine du serveur vocal**, télécharger le dossier d'installation
-complet pour inclure les scripts de renouvellement TLS. La commande télécharge **l'archive d'installation de la release `.4`**, incluant les scripts de renouvellement TLS. Elle **ne compile rien** et utilise un installateur épinglé sur la release BloodMoon `.4`. Le serveur WolfVoice officiel ne comprend pas encore tous les correctifs BloodMoon.
+complet pour inclure les scripts de renouvellement TLS. La commande télécharge **l'archive d'installation BloodMoon Voice `v1.0.0`**, incluant les scripts de renouvellement TLS. Elle **ne compile rien** et utilise un installateur épinglé sur la release BloodMoon Voice `v1.0.0` (issue du code de WolfVoice BloodMoon `.4`). Le serveur WolfVoice officiel ne comprend pas encore tous les correctifs BloodMoon.
 
 ```bash
 (
