@@ -1,10 +1,10 @@
 # Installer BloodMoon Voice sur sa propre grille — guide français
 
-[Retour aux téléchargements](TELECHARGEMENTS_FR.md)
+[Présentation et fonctionnalités](../README.fr.md) · [Téléchargements](TELECHARGEMENTS_FR.md) · [English installation guide](INSTALLATION.md)
 
 Ce parcours concerne **une nouvelle installation** sur un serveur Ubuntu 24.04
 Linux x86-64 avec systemd, et des simulateurs OpenSim 0.9.3.1 / .NET 8.
-Il installe le **serveur BloodMoon v0.2.0-bloodmoon.4**, avec le correctif des axes, sans compilation. **Cette commande seule ne déploie pas le service central de conférences AdHoc.**
+Il installe le **serveur BloodMoon Voice v1.0.0 (binaire de la version BloodMoon v0.2.0-bloodmoon.4)**, avec le correctif des axes, sans compilation. **Cette commande seule ne déploie pas le service central de conférences AdHoc.**
 
 Si la voix fonctionne déjà, suivre plutôt [la mise à jour en fin de page](#mise-à-jour-dun-serveur-déjà-installé).
 Ne pas lancer l'installateur pour mettre à jour un service personnalisé.
@@ -222,8 +222,7 @@ sans vérifier sa compatibilité.
 
 ## 7. Configurer le simulateur
 
-Créer ou remplacer le fichier **bin/config/wolfvoice.ini** après sauvegarde
-de l'ancien fichier. Copier ceci, puis remplacer le nom DNS :
+Après sauvegarde, créer le fichier **bin/config/wolfvoice.ini** pour une installation neuve ; sur une installation existante, modifier seulement les paramètres nécessaires. Adapter les noms DNS et chemins de clés :
 
 ```ini
 [WebRtcVoice]
@@ -234,8 +233,8 @@ de l'ancien fichier. Copier ceci, puis remplacer le nom DNS :
     RpcKeyFile = voice_rpc_key
     CredKeyFile = voice_cred_key
     MessageDetails = false
-    ; Conférences AdHoc : API à déployer sur VOTRE propre grille.
-    ; Les simulateurs approuvés par BloodMoon peuvent utiliser :
+    ; Conférences AdHoc : activer seulement après installation de VOTRE API.
+    ; Remplacer l'URL fictive par celle de votre propre serveur web.
     ; ConferenceApiUrl = https://conference.example.org/adhocconf/wolf_api.php
     StunServers = stun:stun.l.google.com:19302,stun:stun1.l.google.com:19302
 
@@ -261,7 +260,30 @@ DNS indiqué dans l'URI ; ne pas remplacer ce nom par une IP.
 Dans cette architecture, les simulateurs contactent WolfVoice directement.
 Il n'y a rien à ajouter dans la liste de services de ROBUST pour la voix.
 
-## 8. Redémarrer et tester
+## 8. Installer et configurer l'API indépendante des conférences AdHoc
+
+**Cette étape est nécessaire pour les conférences IM à plusieurs avatars et leurs appels vocaux facultatifs.** Sans elle, les fonctions vocales classiques restent disponibles mais les conférences AdHoc complètes ne peuvent pas fonctionner.
+
+**Dépôt à utiliser : [OpenSimulator-AdHocConferences](https://github.com/Vlad-BloodMoon/OpenSimulator-AdHocConferences)**. Ne pas installer son ancienne DLL autonome : le module correct est déjà fourni dans le paquet OpenSimulator `v0.9.3.1-webrtc.3` de l'étape 6.
+
+1. Préparer un serveur web HTTPS avec PHP 8.3 ou supérieur, PDO MySQL et une base MySQL 8. Le serveur web peut être séparé du serveur vocal, à condition d'assurer un accès privé sécurisé aux clés nécessaires.
+2. Dans le dépôt AdHoc, utiliser **uniquement les fichiers actuels** `database/wolf_schema.sql`, `web/wolf_api.php` et `web/wolf_config.php.example`. Les anciens `schema.sql` et `conferences.php` sont des prototypes obsolètes.
+3. Créer une base de données dédiée et importer `database/wolf_schema.sql`. Créer un compte SQL aux droits limités. Préparer la configuration privée `wolf_config.php` avec le DSN, le compte SQL, le chemin sécurisé vers la clé `CredKeyFile`, la durée des sessions et les autorisations.
+4. **Point à ne pas manquer :** le fichier PHP actuel interroge aussi `wolfvoice_admin.servers` pour vérifier les IP autorisées (`status='allowed'`). Il faut installer une liste compatible ou adapter ce contrôle au serveur de votre grille. **Sans ce prérequis l'API n'est pas prête à fonctionner sur une installation indépendante.**
+5. Publier `wolf_api.php` derrière HTTPS, empêcher tout accès HTTP direct au fichier `wolf_config.php` et donner accès aux clés **uniquement** au service PHP autorisé. Le service utilise des requêtes POST signées, et non un formulaire public.
+6. Sur **chaque simulateur** participant, activer dans `bin/config/wolfvoice.ini`, section `[WebRtcVoice]` :
+
+```ini
+ConferenceApiUrl = https://conference.example.org/adhocconf/wolf_api.php
+```
+
+**L'adresse est fictive :** remplacer `conference.example.org` par **votre véritable domaine HTTPS** et adapter le chemin au dossier où **vous** avez installé `wolf_api.php`. Il ne faut ni utiliser l'adresse de production BloodMoon ni recopier ses clés. Un serveur non autorisé ne peut pas utiliser l'API BloodMoon.
+
+7. Redémarrer tous les simulateurs concernés. Faire les tests de la section suivante, y compris deux avatars situés sur **deux simulateurs différents**.
+
+**Pour les commandes SQL, les réglages PHP, la liste de confiance et le dépannage**, suivre le [guide français du dépôt AdHoc](https://github.com/Vlad-BloodMoon/OpenSimulator-AdHocConferences/blob/main/docs/INSTALLATION.fr.md) et sa [documentation détaillée en anglais](https://github.com/Vlad-BloodMoon/OpenSimulator-AdHocConferences/blob/main/docs/INSTALLATION.md). Le déploiement de l'API indépendante nécessite un contrôle de sécurité avant de donner accès à d'autres administrateurs.
+
+## 9. Redémarrer et tester
 
 Redémarrer le simulateur. Avec un viewer compatible WebRTC :
 1. Activer la voix au niveau du domaine/estate et de la parcelle
@@ -270,9 +292,10 @@ Redémarrer le simulateur. Avec un viewer compatible WebRTC :
 3. Tester les indicateurs de parole et le volume individuel.
 4. Marcher en parlant et tourner l'avatar pour vérifier la spatialisation.
 5. Tester un appel privé IM, raccrocher, puis vérifier le retour à la voix locale.
-6. Pour tester entre deux simulateurs, équiper les deux des mêmes modules et clés.
+6. Pour les conférences AdHoc, ouvrir un IM à plusieurs avatars, envoyer des messages et vérifier leur réception par tous, puis lancer un appel vocal facultatif. Tester le raccrochage et le retour individuel.
+7. Refaire le test avec des avatars sur **deux simulateurs différents**, chacun configuré avec les modules `.3`, les clés et `ConferenceApiUrl`.
 
-Les visiteurs Hypergrid ont été testés sur BloodMoon avec succès.
+Les visiteurs Hypergrid ont été testés sur BloodMoon avec succès. Les résultats sur d'autres grilles dépendent de leur configuration.
 Les appels vocaux des groupes OpenSim existants et leurs invitations entre simulateurs ont été validés avec les modules `v0.9.3.1-webrtc.3`. **Les conférences AdHoc écrites et vocales sont également validées entre deux simulateurs** ; elles nécessitent **en plus** l’API centrale PHP/MySQL et une configuration `ConferenceApiUrl` sur chacun. Une nouvelle grille indépendante doit déployer et adapter sa propre API ; le service BloodMoon hébergé est réservé aux simulateurs approuvés.
 Ne pas confondre ces fonctionnalités avec un appel privé entre deux avatars.
 
@@ -280,6 +303,8 @@ Ne pas confondre ces fonctionnalités avec un appel privé entre deux avatars.
 
 | Symptôme | Vérification |
 | --- | --- |
+| Conférence AdHoc impossible | Vérifier que l'API PHP/MySQL est installée, que `ConferenceApiUrl` n'est pas une adresse fictive et que chaque simulateur est autorisé |
+| Réponse HTTP 403 de l'API | Vérifier la clé partagée, l'IP autorisée et la signature ; ne jamais publier de secrets |
 | Aucun accès au serveur | TCP 9443 ouvert après l'étape 5 sur les pare-feu serveur/hébergeur, DNS et TLS |
 | Connexion vocale sans son | IP publique annoncée, UDP 40000–40999 et éventuelle redirection NAT |
 | Appel refusé / mauvaise clé RPC | Mêmes fichiers de clés, chemins corrects et compte OpenSim autorisé à les lire |
