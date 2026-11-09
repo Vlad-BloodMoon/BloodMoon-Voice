@@ -1,0 +1,44 @@
+name: Publish BloodMoon Voice installer bundle
+
+on:
+  push:
+    paths:
+      - .github/workflows/publish-bloodmoon-installer.yml
+      - setup.sh
+      - contrib/**
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  package-installer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify installer targets and package files
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -n setup.sh
+          grep -Fq 'REPO="Vlad-BloodMoon/BloodMoon-Voice"' setup.sh
+          grep -Fq 'RELEASE_TAG="v1.0.0"' setup.sh
+          mkdir -p dist
+          tar -czf dist/BloodMoon-Voice-installer-v1.0.0.tar.gz \
+            setup.sh \
+            contrib/10-open-acme-port.sh \
+            contrib/10-close-acme-port.sh \
+            contrib/10-install-wolfvoice-cert.sh \
+            contrib/wolfvoice.service \
+            contrib/wolfvoice.ini \
+            contrib/wolfvoice-fresh-grid.ini.example
+          tar -tzf dist/BloodMoon-Voice-installer-v1.0.0.tar.gz | grep -Fx 'setup.sh'
+          (cd dist && sha256sum BloodMoon-Voice-installer-v1.0.0.tar.gz > BloodMoon-Voice-installer-v1.0.0.tar.gz.sha256)
+          (cd dist && sha256sum -c BloodMoon-Voice-installer-v1.0.0.tar.gz.sha256)
+      - name: Add adapted installer assets to v1.0.0
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release view v1.0.0 --repo "$GITHUB_REPOSITORY"
+          gh release upload v1.0.0 dist/BloodMoon-Voice-installer-v1.0.0.tar.gz dist/BloodMoon-Voice-installer-v1.0.0.tar.gz.sha256 --repo "$GITHUB_REPOSITORY" --clobber
