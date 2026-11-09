@@ -1,0 +1,61 @@
+name: Publish imported BloodMoon Voice baseline release
+
+on:
+  push:
+    paths:
+      - .github/workflows/import-bloodmoon-release.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download, verify and republish original release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEST_REPO: ${{ github.repository }}
+          SOURCE_REPO: Vlad-BloodMoon/wolfvoice
+          SOURCE_TAG: v0.2.0-bloodmoon.4
+          TARGET_TAG: v1.0.0
+          BASE_COMMIT: bdf9d9d325f5c5ab7cbec82a99bcc2f8a0040619
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view "$TARGET_TAG" --repo "$DEST_REPO" >/dev/null 2>&1; then
+            echo "Release $TARGET_TAG already exists; leaving it unchanged."
+            exit 0
+          fi
+          curl --fail --location --silent --show-error --retry 3 \
+            "https://api.github.com/repos/$SOURCE_REPO/releases/tags/$SOURCE_TAG" \
+            -o original-release.json
+          mkdir -p assets
+          jq -r '.assets[] | [.name, .browser_download_url, (.digest // "")] | @tsv' original-release.json |
+          while IFS=$'\t' read -r filename url digest; do
+            echo "Downloading $filename"
+            curl --fail --location --silent --show-error --retry 3 "$url" -o "assets/$filename"
+            if [[ "$digest" == sha256:* ]]; then
+              expected="${digest#sha256:}"
+              actual="$(sha256sum "assets/$filename" | cut -d' ' -f1)"
+              [[ "$expected" == "$actual" ]] || { echo "SHA256 mismatch: $filename"; exit 1; }
+            fi
+          done
+          [[ "$(find assets -maxdepth 1 -type f | wc -l)" -eq 9 ]] || { echo "Expected 9 release assets"; exit 1; }
+          {
+            echo "# BloodMoon Voice v1.0.0 — initial independent baseline"
+            echo
+            echo "Exact source tree of [WolfVoice BloodMoon v0.2.0-bloodmoon.4](https://github.com/$SOURCE_REPO/releases/tag/$SOURCE_TAG), republished under the BloodMoon Voice identity with the original 9 downloadable assets and upstream notices."
+            echo
+            echo "**Attribution:** based on the WolfVoice project by its original authors, with BloodMoon modifications. Refer to LICENSE and NOTICE."
+            echo
+            echo "**Important:** full ad-hoc IM/voice conferences additionally require compatible BloodMoon OpenSimulator modules and the separate conference PHP/MySQL API; that API is not included in this server source snapshot."
+            echo
+            jq -r '.body' original-release.json | sed "s#https://github.com/$SOURCE_REPO/releases/download/$SOURCE_TAG/#https://github.com/$DEST_REPO/releases/download/$TARGET_TAG/#g"
+          } > release-notes.md
+          gh release create "$TARGET_TAG" assets/* \
+            --repo "$DEST_REPO" --target "$BASE_COMMIT" \
+            --title "BloodMoon Voice v1.0.0 — complete BloodMoon baseline" \
+            --notes-file release-notes.md
+          echo "Published release with 9 verified original assets."
