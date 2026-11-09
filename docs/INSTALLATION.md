@@ -4,7 +4,7 @@
 
 Precompiled OpenSim 0.9.3.1 DLL/PDB package: [download ZIP](https://github.com/Vlad-BloodMoon/BloodMoon-Voice/releases/download/v1.0.0/WebRTC_Modules_BloodMoon_0.9.3.1-webrtc.3.zip). No compilation is needed for this matching BloodMoon version. The complete AdHoc feature set requires the **BloodMoon-modified WolfVoice server**, the **matching regional modules** and a **separate conference PHP/MySQL registry**, not stock upstream WolfVoice.
 
-For this fork, the current setup.sh on main installs the v0.2.0-bloodmoon.4 server but does NOT create signing keys, install simulator DLLs, or deploy the conference PHP API. Existing servers using the validated `.2/.3` binary need no server replacement for this feature. Historical source tags retain their original installer; use the current script linked below.
+For this fork, the current setup.sh on main installs the BloodMoon Voice v1.0.0 server (same original BloodMoon-validated binary) but does NOT create signing keys, install simulator DLLs, or deploy the conference PHP API. Existing servers using the validated `.2/.3` binary need no server replacement for this feature. Historical source tags retain their original installer; use the current script linked below.
 Create them manually as described below. Never paste a key into a public issue,
 README, screenshot or download archive.
 
@@ -139,6 +139,8 @@ audio in both directions, then hangup and return to local voice.
 
 
 ## 6A. BloodMoon multi-avatar IM conferences and optional group voice
+
+**Read the [complete three-project installation guide](COMPLETE_STACK.md).** Required: [BloodMoon Voice server v1.0.0](https://github.com/Vlad-BloodMoon/BloodMoon-Voice/releases/tag/v1.0.0), **the exact [OpenSimulator module release v0.9.3.1-webrtc.3](https://github.com/Vlad-BloodMoon/opensim/releases/tag/v0.9.3.1-webrtc.3)** (including the already-integrated AdHoc regional DLL), and the separately installed PHP/MySQL conference registry from [OpenSimulator-AdHocConferences](https://github.com/Vlad-BloodMoon/OpenSimulator-AdHocConferences). **Do not replace the .3 regional DLL with an older standalone AdHoc DLL.**
 
 **Compatibility warning:** the **stock upstream WolfVoice server has not yet integrated the complete BloodMoon spatial-axis/group-voice work**. The tested complete package is for the [BloodMoon WolfVoice server](https://github.com/Vlad-BloodMoon/BloodMoon-Voice/releases/tag/v1.0.0) with the [OpenSim WebRTC module `v0.9.3.1-webrtc.3`](https://github.com/Vlad-BloodMoon/opensim/releases/tag/v0.9.3.1-webrtc.3). Ad-hoc conferences **additionally depend on a separate central conference registry** ([PHP/MySQL source, installation and trust model](https://github.com/Vlad-BloodMoon/OpenSimulator-AdHocConferences)). A standalone server and three DLLs **do not** create a conference registry.
 
