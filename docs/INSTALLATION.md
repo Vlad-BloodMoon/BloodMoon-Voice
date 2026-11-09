@@ -147,7 +147,7 @@ audio in both directions, then hangup and return to local voice.
 **Only if the simulator has been approved by BloodMoon**: add to its existing `[WebRtcVoice]` section without disturbing server URI/key files:
 
 ```ini
-ConferenceApiUrl = https://bloodmoonpack.com/adhocconf/wolf_api.php
+ConferenceApiUrl = https://conference.example.org/adhocconf/wolf_api.php
 ```
 
 The URL is restricted to trusted, authorized simulator hosts sharing the correct voice credential key. It is **not a public unrestricted API**. For your **own independent grid**, deploy and configure your **own** conference registry and use **your own** URL and key material instead. Do not copy BloodMoon's key onto unknown or untrusted machines. A grid operator holding the shared secret can sign actions for other avatar UUIDs: consider independent per-simulator authorization before federation.
