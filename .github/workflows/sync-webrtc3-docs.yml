@@ -1,4 +1,5 @@
 name: Synchronize corrected WebRTC .3 modules and public release instructions
+# Keep the module ZIP documentation aligned with the canonical OpenSimulator release.
 
 on:
   push:
