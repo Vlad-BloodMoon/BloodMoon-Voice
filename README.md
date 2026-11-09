@@ -40,11 +40,12 @@ In every relevant simulator's `bin/config/wolfvoice.ini`, configure your own voi
 [WebRtcVoice]
 Enabled = true
 WebRtcVoiceServerURI = https://voice.example.org:9443
+RpcKeyFile = voice_rpc_key
 CredKeyFile = voice_cred_key
 ConferenceApiUrl = https://conference.example.org/adhocconf/wolf_api.php
 ```
 
-**Both domains above are fictional placeholders, not functioning public services.** Replace `voice.example.org` with your voice server's real TLS hostname and `conference.example.org` with the domain serving **your installed** `wolf_api.php`. Retain any other settings required by your voice authentication mode, including `RpcKeyFile` when used. For cross-simulator AdHoc conferences, every participating simulator must configure `ConferenceApiUrl`. BloodMoon's own hosted conference API is restricted to approved trusted simulators; it is not an endpoint others can freely use.
+**Both domains above are fictional placeholders, not functioning public services.** Replace `voice.example.org` with your voice server's real TLS hostname and `conference.example.org` with the domain serving **your installed** `wolf_api.php`. **The example shows the two-key mode used by the fresh-installation guide:** `RpcKeyFile` authenticates simulator-to-server requests and `CredKeyFile` signs voice credentials. Create the keys securely as described in the [English installation guide](docs/INSTALLATION.md); simply naming files does not create them. **Existing one-key deployments with an IP allowlist, such as BloodMoon, must retain their already-working authentication configuration instead of adding or regenerating an RPC key.** For cross-simulator AdHoc conferences, every participating simulator must configure `ConferenceApiUrl`. BloodMoon's own hosted conference API is restricted to approved trusted simulators; it is not an endpoint others can freely use.
 
 The current AdHoc PHP backend also expects an allowed-server registry (`wolfvoice_admin.servers`) and the shared credential key. **Independent operators must provide or adapt those dependencies.** Never publish voice keys.
 
