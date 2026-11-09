@@ -8,11 +8,11 @@
 
 | Component | Release file |
 | --- | --- |
-| **Voice server**, Linux x86-64 static | [`wolfvoice-x86_64-linux-musl`](https://github.com/Vlad-BloodMoon/wolfvoice/releases/download/v0.2.0-bloodmoon.4/wolfvoice-x86_64-linux-musl) and [SHA-256](https://github.com/Vlad-BloodMoon/wolfvoice/releases/download/v0.2.0-bloodmoon.4/wolfvoice-x86_64-linux-musl.sha256) |
-| **Complete OpenSimulator 0.9.3.1 modules**, three DLL/PDB pairs | [`WebRTC_Modules_BloodMoon_0.9.3.1-webrtc.3.zip`](https://github.com/Vlad-BloodMoon/wolfvoice/releases/download/v0.2.0-bloodmoon.4/WebRTC_Modules_BloodMoon_0.9.3.1-webrtc.3.zip) and [SHA-256](https://github.com/Vlad-BloodMoon/wolfvoice/releases/download/v0.2.0-bloodmoon.4/WebRTC_Modules_BloodMoon_0.9.3.1-webrtc.3.zip.sha256) |
+| **Voice server**, Linux x86-64 static | [`wolfvoice-x86_64-linux-musl`](https://github.com/Vlad-BloodMoon/BloodMoon-Voice/releases/download/v1.0.0/wolfvoice-x86_64-linux-musl) and [SHA-256](https://github.com/Vlad-BloodMoon/BloodMoon-Voice/releases/download/v1.0.0/wolfvoice-x86_64-linux-musl.sha256) |
+| **Complete OpenSimulator 0.9.3.1 modules**, three DLL/PDB pairs | [`WebRTC_Modules_BloodMoon_0.9.3.1-webrtc.3.zip`](https://github.com/Vlad-BloodMoon/BloodMoon-Voice/releases/download/v1.0.0/WebRTC_Modules_BloodMoon_0.9.3.1-webrtc.3.zip) and [SHA-256](https://github.com/Vlad-BloodMoon/BloodMoon-Voice/releases/download/v1.0.0/WebRTC_Modules_BloodMoon_0.9.3.1-webrtc.3.zip.sha256) |
 | Source module release | [Vlad-BloodMoon/opensim `v0.9.3.1-webrtc.3`](https://github.com/Vlad-BloodMoon/opensim/releases/tag/v0.9.3.1-webrtc.3) |
 | **Ad-hoc conference API** source and dedicated documentation | [OpenSimulator-AdHocConferences `v0.1.0`](https://github.com/Vlad-BloodMoon/OpenSimulator-AdHocConferences/releases/tag/v0.1.0) |
-| New installations | [French installation](https://github.com/Vlad-BloodMoon/wolfvoice/blob/main/docs/INSTALLATION_FR.md) · [English installation](https://github.com/Vlad-BloodMoon/wolfvoice/blob/main/docs/INSTALLATION.md) · [downloads FR](https://github.com/Vlad-BloodMoon/wolfvoice/blob/main/docs/TELECHARGEMENTS_FR.md) |
+| New installations | [French installation](https://github.com/Vlad-BloodMoon/BloodMoon-Voice/blob/main/docs/INSTALLATION_FR.md) · [English installation](https://github.com/Vlad-BloodMoon/BloodMoon-Voice/blob/main/docs/INSTALLATION.md) · [downloads FR](https://github.com/Vlad-BloodMoon/BloodMoon-Voice/blob/main/docs/TELECHARGEMENTS_FR.md) |
 
 **The server executable is intentionally byte-identical to the successful `v0.2.0-bloodmoon.3` / `.2` build.** No new media-server binary is required for the ad-hoc feature; **simulator module and central conference API** provide the new behavior. If your BloodMoon server is already functioning with that executable, **do not replace/restart it just to upgrade region modules**.
 
