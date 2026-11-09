@@ -64,7 +64,7 @@ sudo apt-get update
 sudo apt-get install -y curl ca-certificates openssl python3
 mkdir -p "$HOME/wolfvoice-installation"
 cd "$HOME/wolfvoice-installation"
-curl -fL https://github.com/Vlad-BloodMoon/wolfvoice/releases/download/v0.2.0-bloodmoon.4/wolfvoice-installation-bloodmoon.4.tar.gz -o wolfvoice-installation.tar.gz
+curl -fL https://github.com/Vlad-BloodMoon/BloodMoon-Voice/releases/download/v1.0.0/wolfvoice-installation-bloodmoon.4.tar.gz -o wolfvoice-installation.tar.gz
 mkdir -p source
 tar -xzf wolfvoice-installation.tar.gz -C source
 cd source
@@ -189,8 +189,8 @@ constituent pas une autorisation d'utiliser le service.
 Pour mettre à jour des modules **déjà compatibles avec la même base**, remplacer uniquement `WebRtcVoiceRegionModule.dll` et son `.pdb`, conserver les autres DLL, la configuration et les clés, puis redémarrer. Les étapes ci-dessous installent les **trois paires compatibles** pour une nouvelle installation.
 
 Télécharger :
-- [WebRTC_Modules_BloodMoon_0.9.3.1-webrtc.3.zip](https://github.com/Vlad-BloodMoon/wolfvoice/releases/download/v0.2.0-bloodmoon.4/WebRTC_Modules_BloodMoon_0.9.3.1-webrtc.3.zip)
-- [sa somme de contrôle](https://github.com/Vlad-BloodMoon/wolfvoice/releases/download/v0.2.0-bloodmoon.4/WebRTC_Modules_BloodMoon_0.9.3.1-webrtc.3.zip.sha256)
+- [WebRTC_Modules_BloodMoon_0.9.3.1-webrtc.3.zip](https://github.com/Vlad-BloodMoon/BloodMoon-Voice/releases/download/v1.0.0/WebRTC_Modules_BloodMoon_0.9.3.1-webrtc.3.zip)
+- [sa somme de contrôle](https://github.com/Vlad-BloodMoon/BloodMoon-Voice/releases/download/v1.0.0/WebRTC_Modules_BloodMoon_0.9.3.1-webrtc.3.zip.sha256)
 
 Sous Linux, depuis le dossier contenant ces deux téléchargements :
 `sha256sum -c WebRTC_Modules_BloodMoon_0.9.3.1-webrtc.3.zip.sha256`.
@@ -240,7 +240,7 @@ de l'ancien fichier. Copier ceci, puis remplacer le nom DNS :
 ```
 
 [Modèle à télécharger](../contrib/wolfvoice-fresh-grid.ini.example)
-([fichier brut](https://raw.githubusercontent.com/Vlad-BloodMoon/wolfvoice/main/contrib/wolfvoice-fresh-grid.ini.example)).
+([fichier brut](https://raw.githubusercontent.com/Vlad-BloodMoon/BloodMoon-Voice/main/contrib/wolfvoice-fresh-grid.ini.example)).
 Enregistrer sous `wolfvoice.ini`, pas `wolfvoice.ini.txt`.
 
 Les fichiers doivent être ici :
