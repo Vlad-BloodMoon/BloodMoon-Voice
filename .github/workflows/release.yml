@@ -1,0 +1,124 @@
+name: release
+
+# Builds wolfvoice for every supported platform and attaches the binaries to a
+# GitHub Release. Triggered by pushing a tag like v0.1.0, or manually.
+#
+# setup.sh downloads from these release assets, so the asset NAMES are part of the
+# interface — keep the `asset` fields below in step with setup.sh.
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: ${{ matrix.asset }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            asset: wolfvoice-x86_64-linux-gnu
+          # Static builds run on any Linux regardless of glibc version, which is
+          # what setup.sh prefers.
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            asset: wolfvoice-x86_64-linux-musl
+            musl: true
+          - os: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+            asset: wolfvoice-aarch64-linux-gnu
+          - os: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-musl
+            asset: wolfvoice-aarch64-linux-musl
+            musl: true
+          # macOS and Windows are NOT built here, deliberately. Both are blocked on
+          # the same upstream knot in the opus crate, which vendors libopus and
+          # builds it with cmake:
+          #
+          #   * libopus declares cmake_minimum_required(VERSION 3.1), and CMake 4
+          #     — which those runner images now ship — refuses it outright:
+          #     "Compatibility with CMake < 3.5 has been removed from CMake."
+          #   * Pinning CMake 3.31 fixes that, but 3.31 does not know the
+          #     "Visual Studio 18 2026" generator on the current Windows image,
+          #     so Windows swaps one failure for another.
+          #
+          # A voice service runs on Linux in practice, so rather than ship a
+          # fragile workaround this is left to `cargo build --release` from source
+          # on those platforms, where the developer's own cmake is whatever works.
+          # Worth revisiting when the opus crate's vendored libopus updates its
+          # cmake_minimum_required.
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install musl toolchain
+        if: matrix.musl
+        run: sudo apt-get update && sudo apt-get install -y musl-tools musl-dev
+
+      - name: Build
+        shell: bash
+        env:
+          # `CC_*` only affects build scripts (the cc/cmake crates). The FINAL
+          # link needs the target linker set explicitly, or cargo invokes the
+          # system `cc` for a musl target.
+          CC_x86_64_unknown_linux_musl: musl-gcc
+          CC_aarch64_unknown_linux_musl: musl-gcc
+          CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER: musl-gcc
+          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER: musl-gcc
+          # musl ships libm.a as a STUB — the math functions actually live in
+          # libc.a — and static linking resolves left to right, so libopus.a
+          # appearing after libc leaves sqrtf/exp/log/lrintf unresolved.
+          # Appending -lm alone changed nothing for exactly that reason; libc has
+          # to come round a second time, after libopus.
+          RUSTFLAGS: ${{ matrix.musl && '-C link-arg=-lm -C link-arg=-lc' || '' }}
+        run: cargo build --release --locked --target ${{ matrix.target }}
+
+      - name: Stage asset
+        shell: bash
+        run: |
+          mkdir -p dist
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            cp "target/${{ matrix.target }}/release/wolfvoice.exe" "dist/${{ matrix.asset }}"
+          else
+            cp "target/${{ matrix.target }}/release/wolfvoice" "dist/${{ matrix.asset }}"
+            chmod +x "dist/${{ matrix.asset }}"
+          fi
+          # A checksum beside each binary, so setup.sh can verify what it fetched.
+          cd dist
+          if command -v sha256sum >/dev/null; then
+            sha256sum "${{ matrix.asset }}" > "${{ matrix.asset }}.sha256"
+          else
+            shasum -a 256 "${{ matrix.asset }}" > "${{ matrix.asset }}.sha256"
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset }}
+          path: dist/*
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true

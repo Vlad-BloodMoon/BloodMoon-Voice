@@ -1,0 +1,70 @@
+name: Publish validated voice release
+on:
+  push:
+    branches: ["main"]
+    paths: [".github/workflows/publish-validated.yml"]
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+jobs:
+  publish:
+    if: github.repository == 'Vlad-BloodMoon/wolfvoice' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify validated build provenance and download
+        run: |
+          set -euo pipefail
+          test "$(gh api repos/$GH_REPO/actions/runs/40700492483 --jq .head_sha)" = 'aa14b9c7bd37f67382b8d59945bda26d86e5975d'
+          test "$(gh api repos/$GH_REPO/actions/runs/40700492483 --jq .conclusion)" = success
+          gh run download 40700492483 --name 'wolfvoice-spatial-test-compatible-linux-x86_64' --dir validated
+          test "$(cat validated/COMMIT.txt)" = 'aa14b9c7bd37f67382b8d59945bda26d86e5975d'
+          cd validated
+          sha256sum -c SHA256SUMS
+      - name: Package public files without grid credentials
+        run: |
+          set -euo pipefail
+          mkdir dist
+          cp validated/wolfvoice dist/wolfvoice-x86_64-linux-musl
+          cp docs/SPATIAL_INVESTIGATION.md dist/SPATIAL_FIX.md
+          cp "docs/RELEASE-v0.2.0-bloodmoon.3.md" dist/README.md
+          printf '%s\n' 'aa14b9c7bd37f67382b8d59945bda26d86e5975d' > dist/BUILD_COMMIT.txt
+          cd dist
+          sha256sum wolfvoice-x86_64-linux-musl > wolfvoice-x86_64-linux-musl.sha256
+          sha256sum -c wolfvoice-x86_64-linux-musl.sha256
+          cd ..
+      - name: Package verified OpenSim modules without recompiling
+        run: |
+          set -euo pipefail
+          gh release download v0.9.3.1-webrtc.2 --repo Vlad-BloodMoon/opensim --pattern webrtc-group-recall-fix.zip --dir original
+          echo 'e66b15d8cda19d76b894a1e033f5c5ba0b225d7ce7c6a481ed3f3269b207055c  original/webrtc-group-recall-fix.zip' | sha256sum -c -
+          mkdir modules
+          unzip -q original/webrtc-group-recall-fix.zip -d modules
+          test "$(cat modules/COMMIT.txt)" = 07fca6e6e50d8998e61f3fb066f39013281216ba
+          (cd modules && sha256sum --strict -c SHA256SUMS)
+          cp docs/GROUP_VOICE_RELEASE.md modules/README.md
+          python3 - <<'PY'
+          import hashlib, pathlib, zipfile
+          root = pathlib.Path('modules')
+          (root / 'SHA256SUMS').write_text(''.join(hashlib.sha256(p.read_bytes()).hexdigest() + '  ' + p.name + chr(10) for p in sorted(root.iterdir()) if p.name != 'SHA256SUMS'))
+          out = pathlib.Path('dist/WebRTC_Modules_0.9.3.1-webrtc.2.zip')
+          with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED) as archive:
+              for p in sorted(root.iterdir()):
+                  archive.write(p, p.name)
+          out.with_suffix('.zip.sha256').write_text(hashlib.sha256(out.read_bytes()).hexdigest() + '  ' + out.name + chr(10))
+          PY
+          (cd dist && sha256sum -c WebRTC_Modules_0.9.3.1-webrtc.2.zip.sha256)
+      - name: Publish normal release
+        run: |
+          set -euo pipefail
+          if gh release view 'v0.2.0-bloodmoon.3' >/dev/null 2>&1; then
+            gh release upload 'v0.2.0-bloodmoon.3' dist/* --clobber
+            gh release edit 'v0.2.0-bloodmoon.3' --notes-file 'docs/RELEASE-v0.2.0-bloodmoon.3.md' --latest
+            exit 0
+          fi
+          gh release create 'v0.2.0-bloodmoon.3' dist/* --target "$GITHUB_SHA" --title 'WolfVoice v0.2.0-bloodmoon.3 - group voice deployment' --notes-file 'docs/RELEASE-v0.2.0-bloodmoon.3.md' --latest

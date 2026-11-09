@@ -1,0 +1,195 @@
+# Running the wolfvoice server
+
+## Requirements
+
+- **Linux** with systemd (the installer is Linux-only; the binary itself also builds
+  and runs on macOS and Windows).
+- **A public IP address.** Not optional, and not something the service can discover.
+  It is the *only* address a viewer ever learns, because Linden Lab's voice protocol
+  gives the server no channel on which to trickle ICE candidates — our candidate list
+  has to be complete in the SDP answer we return. Behind 1:1 NAT, advertise the
+  public address and forward the media range.
+- **A DNS name** pointing at that address, for TLS.
+- **Ports**: TCP 9443 from your region hosts only; UDP 40000–40999 from anywhere.
+- **CPU**: about 17 ms per listener per second, spread across all cores. See [Capacity](#capacity).
+- To build from source: a Rust toolchain and `cmake` (the `opus` crate compiles
+  libopus itself).
+
+## Install
+
+```bash
+curl -fsSLO https://raw.githubusercontent.com/intelligentwolf/wolfvoice/main/setup.sh
+less setup.sh
+sudo bash setup.sh
+```
+
+Or by hand:
+
+```bash
+# 1. binary
+curl -fsSLO https://github.com/intelligentwolf/wolfvoice/releases/latest/download/wolfvoice-x86_64-linux-musl
+curl -fsSLO https://github.com/intelligentwolf/wolfvoice/releases/latest/download/wolfvoice-x86_64-linux-musl.sha256
+sha256sum -c wolfvoice-x86_64-linux-musl.sha256
+sudo install -m0755 wolfvoice-x86_64-linux-musl /usr/local/bin/wolfvoice
+
+# 2. unprivileged user
+sudo useradd --system --home-dir /var/lib/wolfvoice --create-home \
+             --shell /usr/sbin/nologin wolfvoice
+
+# 3. TLS (see below), then the unit
+sudo cp contrib/wolfvoice.service /etc/systemd/system/
+sudo sed -i 's/203.0.113.10/YOUR.PUBLIC.IP/' /etc/systemd/system/wolfvoice.service
+sudo systemctl daemon-reload && sudo systemctl enable --now wolfvoice
+```
+
+## Configuration
+
+Everything is environment variables; there is no config file.
+
+| Variable | Required | Meaning |
+|---|---|---|
+| `WOLFVOICE_PUBLIC_IP` | **yes** | Public address to advertise in ICE candidates. The service refuses to start without it rather than guess. |
+| `RUST_LOG` | no | `info` (default), or `debug` for per-session detail. |
+| `WOLFVOICE_RPC_KEY` | no | The relay key (else `/etc/wolfvoice/rpc_key`). Without one the JSON-RPC is open to anything that reaches it. 0.2.0+, see [SECURITY.md](SECURITY.md). |
+| `WOLFVOICE_CRED_KEY` | no | The credential key (else `/etc/wolfvoice/cred_key`); without one, tickets are checked against the relay key. 0.2.0+. |
+| `WOLFVOICE_LEGACY_CREDENTIALS` | no | `0` stops accepting tickets signed with the relay key once a credential key is set. Default: accepted (change-over). 0.2.0+. |
+| `WOLFVOICE_ICE_ALLOW` | no | Comma-separated CIDRs of your own networks whose ICE candidates may be tried; otherwise only public addresses. 0.2.0+. |
+| `WOLFVOICE_BIND` | no | Address and port of the JSON-RPC listener. Default `0.0.0.0:9443`. |
+| `WOLFVOICE_MEDIA_LO` / `WOLFVOICE_MEDIA_HI` | no | The UDP media port range. Default 40000-40999; must give at least 900 ports (`MAX_SESSIONS`). Change your firewall to match. |
+| `WOLFVOICE_NPC_HOSTS` | no | Optional story/NPC voices (`wolf.npc_speak`): comma-separated host names WAV clips may be fetched from over https. Unset (the default): off. 0.2.0+. |
+| `WOLFVOICE_BRIDGE_KEY` | no | Optional Discord voice bridge (else `/etc/wolfvoice/bridge_key`, at least 32 characters). With no key the bridge port is never opened (the default). Needs a bridge client that is not part of this repository. 0.2.0+. |
+| `WOLFVOICE_BRIDGE_BIND` | no | The bridge listener, default `0.0.0.0:9445`; firewall it to the bridge client only. |
+
+The TLS paths are fixed: `/etc/wolfvoice/tls/fullchain.pem` and `privkey.pem`.
+
+## TLS
+
+The service reads `/etc/wolfvoice/tls/fullchain.pem` and `privkey.pem`, owned by the
+`wolfvoice` user (key mode 0640). It does **not** read `/etc/letsencrypt` directly,
+which is root-only.
+
+`setup.sh` installs three certbot hooks from `contrib/`:
+
+- **pre**: adds port 80 to an nftables set, opening the ACME window
+- **post**: removes it again — so 80 is shut except for the seconds a renewal needs
+- **deploy**: republishes the renewed cert into `/etc/wolfvoice/tls` and reloads the
+  service
+
+Verify the whole renewal path, hooks included:
+
+```bash
+sudo certbot renew --dry-run --no-random-sleep-on-renew --run-deploy-hooks
+```
+
+Two things worth knowing. `--dry-run` alone does **not** run deploy hooks, so a
+broken deploy hook is invisible until the real renewal 60 days later — pass
+`--run-deploy-hooks` and confirm the files in `/etc/wolfvoice/tls` actually change
+(back-date them with `touch -d 2020-01-01` first if you want to be certain). And
+`certbot renew` in non-interactive mode sleeps a random delay of up to 12 minutes
+before doing anything, which looks exactly like a hang; `--no-random-sleep-on-renew`
+is what the systemd timer itself passes.
+
+## Firewall
+
+See `contrib/nftables.conf.example`. Two rules matter:
+
+```
+ip saddr @voice_rpc_clients tcp dport 9443 accept   # region hosts ONLY
+udp dport 40000-40999 accept                        # viewers, from anywhere
+```
+
+**Keep the source restriction even with a relay key.** From 0.2.0 every request must
+carry the relay key ([SECURITY.md](SECURITY.md)), so reaching the port is no longer
+enough to create sessions; the firewall rule remains the first line. Without a relay
+key (wolfvoice 0.1.x, or 0.2.0 serving a region module that sends none) the source
+restriction plus TLS is the entire boundary. Identity is trustworthy either way - the
+*region* tells us which agent a request belongs to; the viewer never asserts who it is.
+
+**Measure your region hosts' egress addresses; do not assume them.** A region in a
+NATed container presents its host's address, which may be nothing like the name you
+ssh to. To measure: `nc -l -p 9999` on the voice host, then connect to it on 9999
+from the region machine — the listener prints the address you need.
+
+If you are applying a default-drop ruleset over SSH, arm a rollback first:
+
+```bash
+systemd-run --on-active=240 --unit=nft-rollback /usr/sbin/nft flush ruleset
+nft -f /etc/nftables.conf
+# now prove a BRAND NEW ssh connection works — your existing one survives on
+# `ct state established` and proves nothing
+systemctl stop nft-rollback.timer
+```
+
+## Operating
+
+```bash
+systemctl status wolfvoice
+journalctl -u wolfvoice -f
+
+# health, from a permitted region host or over loopback
+curl -k https://127.0.0.1:9443/
+# ok
+curl -k -H "X-Wolfvoice-Key: $(cat /etc/wolfvoice/rpc_key)" https://127.0.0.1:9443/
+# {"rooms":1,"service":"wolfvoice","sessions":3}
+# (0.1.x answers the counts to anyone)
+```
+
+Useful log lines:
+
+- `session wv-… agent … region … port 40007 spatial=true (N live)` — a session was
+  provisioned
+- `connection state Connected` — ICE and DTLS completed
+- `data channel SLData` — the channel opened; this is the point at which a viewer
+  considers voice usable
+- `answer SDP carries NO ICE candidates` — **fatal misconfiguration**; check
+  `WOLFVOICE_PUBLIC_IP` and that the media range is bindable
+
+## Capacity
+
+Measure your own with `examples/load_test.rs`; ours, on a 12-core VM:
+
+| Clients | Speaking | Service CPU | Per listener | Frames delivered |
+|---|---|---|---|---|
+| 10 | 5 | 12 % of one core | 12.3 ms/s | all |
+| 40 | 20 | 57 % of one core | 14.2 ms/s | all |
+| 120 | 60 | **203 % of one core** | 16.9 ms/s | all, no ticks dropped |
+
+Cost is roughly linear in listeners; the per-listener Opus encode dominates and the
+O(N²) frame summing is comparatively free. Speaker count barely matters.
+
+The mixer uses every core available to it: one task per room, and one task per
+listener within a room. Both axes are needed — per-room parallelism alone would still
+put a single busy region on a single core, which is exactly the case that matters.
+
+Ceilings, in the order you will meet them:
+
+1. **1000 sessions** — one UDP socket per peer connection, bounded by the media port
+   range. Widen the range and `MEDIA_PORT_HI` together.
+2. **CPU** — at ~17 ms per listener per second, a 12-core host is in the region of
+   700 listeners before saturating. Scale cores with expected crowd size.
+
+Overload is handled by dropping whole 20 ms ticks rather than queueing work, so a
+struggling host degrades audibly but predictably instead of growing a task backlog
+until it dies. Watch for:
+
+```
+mixer overloaded: N tick(s) skipped in the last 10s
+```
+
+Skipping a tick also guarantees the previous tick's work has drained, so two frames
+for the same endpoint can never race and emit RTP timestamps out of order.
+
+Sessions are per viewer *per audible region*: a viewer near a region corner can hold
+up to four at once, because Firestorm probes eight compass directions at twice its
+50 m audio range and opens a connection for each WebRTC-enabled region it finds.
+
+## Upgrading
+
+```bash
+sudo systemctl stop wolfvoice
+sudo install -m0755 wolfvoice-new /usr/local/bin/wolfvoice
+sudo systemctl start wolfvoice
+```
+
+Sessions do not survive a restart, but viewers re-provision automatically within a
+few seconds, so an upgrade costs a short gap rather than manual intervention.
