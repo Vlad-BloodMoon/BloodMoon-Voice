@@ -133,18 +133,16 @@ bin/config/wolfvoice.ini, adapt this example:
     SpatialVoiceService = WebRtcVoice.dll:WebRtcVoiceServiceConnector
     NonSpatialVoiceService = WebRtcVoice.dll:WebRtcVoiceServiceConnector
     WebRtcVoiceServerURI = https://voice.example.org:9443
+    ; New independent installs with relay authentication: use BOTH keys.
+    RpcKeyFile = /etc/opensim/voice_rpc_key
     CredKeyFile = /etc/opensim/voice_cred_key
     MessageDetails = false
-    ; Add only if the VOICE SERVER has relay authentication enabled:
-    ; RpcKeyFile = /etc/opensim/voice_rpc_key
 
 [VivoxVoice]
     enabled = false
 ```
 
-The default RpcKeyFile is /etc/opensim/voice_rpc_key. If it already exists, the
-module reads it even when the line is omitted. Do not delete a deployed key
-without planning the change.
+**The configuration above illustrates the two-key relay-authentication mode recommended in the French fresh-install guide.** Create and securely distribute both keys before using it. If instead you already run a validated **single credential key + trusted-IP allowlist** setup, keep that configuration and omit RpcKeyFile if relay authentication is not enabled. The default RpcKeyFile path may be read when the file exists, even if not explicitly set; check for an existing file before switching modes. Do not change live keys without a migration plan.
 
 ## 6. Start and test
 
