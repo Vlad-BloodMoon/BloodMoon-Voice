@@ -236,7 +236,7 @@ de l'ancien fichier. Copier ceci, puis remplacer le nom DNS :
     MessageDetails = false
     ; Conférences AdHoc : API à déployer sur VOTRE propre grille.
     ; Les simulateurs approuvés par BloodMoon peuvent utiliser :
-    ; ConferenceApiUrl = https://bloodmoonpack.com/adhocconf/wolf_api.php
+    ; ConferenceApiUrl = https://conference.example.org/adhocconf/wolf_api.php
     StunServers = stun:stun.l.google.com:19302,stun:stun1.l.google.com:19302
 
 [VivoxVoice]
