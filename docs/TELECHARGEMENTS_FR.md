@@ -6,14 +6,14 @@
 
 | Téléchargement | Où l'utiliser |
 | --- | --- |
-| [Serveur WolfVoice BloodMoon, Linux x86-64](https://github.com/Vlad-BloodMoon/wolfvoice/releases/download/v0.2.0-bloodmoon.4/wolfvoice-x86_64-linux-musl) | Serveur vocal |
-| [SHA-256 du binaire serveur](https://github.com/Vlad-BloodMoon/wolfvoice/releases/download/v0.2.0-bloodmoon.4/wolfvoice-x86_64-linux-musl.sha256) | Contrôle avant installation |
-| [**Pack complet WebRTC OpenSim 0.9.3.1 — 3 DLL/PDB**](https://github.com/Vlad-BloodMoon/wolfvoice/releases/download/v0.2.0-bloodmoon.4/WebRTC_Modules_BloodMoon_0.9.3.1-webrtc.3.zip) | **Chaque simulateur** |
-| [SHA-256 du ZIP de modules](https://github.com/Vlad-BloodMoon/wolfvoice/releases/download/v0.2.0-bloodmoon.4/WebRTC_Modules_BloodMoon_0.9.3.1-webrtc.3.zip.sha256) | Contrôle du paquet |
+| [Serveur WolfVoice BloodMoon, Linux x86-64](https://github.com/Vlad-BloodMoon/BloodMoon-Voice/releases/download/v1.0.0/wolfvoice-x86_64-linux-musl) | Serveur vocal |
+| [SHA-256 du binaire serveur](https://github.com/Vlad-BloodMoon/BloodMoon-Voice/releases/download/v1.0.0/wolfvoice-x86_64-linux-musl.sha256) | Contrôle avant installation |
+| [**Pack complet WebRTC OpenSim 0.9.3.1 — 3 DLL/PDB**](https://github.com/Vlad-BloodMoon/BloodMoon-Voice/releases/download/v1.0.0/WebRTC_Modules_BloodMoon_0.9.3.1-webrtc.3.zip) | **Chaque simulateur** |
+| [SHA-256 du ZIP de modules](https://github.com/Vlad-BloodMoon/BloodMoon-Voice/releases/download/v1.0.0/WebRTC_Modules_BloodMoon_0.9.3.1-webrtc.3.zip.sha256) | Contrôle du paquet |
 | [Release source des modules OpenSimulator `.3`](https://github.com/Vlad-BloodMoon/opensim/releases/tag/v0.9.3.1-webrtc.3) | Sources et historique |
 | [API AdHoc et documentation](https://github.com/Vlad-BloodMoon/OpenSimulator-AdHocConferences/releases/tag/v0.1.0) | Service central de conférences ; installation distincte |
 | [Fichier exemple WolfVoice](../contrib/wolfvoice-fresh-grid.ini.example) | Exemple à adapter, sans clé privée |
-| [Installateur complet avec scripts TLS — `.tar.gz`](https://github.com/Vlad-BloodMoon/wolfvoice/releases/download/v0.2.0-bloodmoon.4/wolfvoice-installation-bloodmoon.4.tar.gz) | **Nouvelle installation serveur uniquement** |
+| [Installateur complet avec scripts TLS — `.tar.gz`](https://github.com/Vlad-BloodMoon/BloodMoon-Voice/releases/download/v1.0.0/wolfvoice-installation-bloodmoon.4.tar.gz) | **Nouvelle installation serveur uniquement** |
 
 ## Le paquet complet des modules
 
