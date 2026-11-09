@@ -24,7 +24,7 @@ For a **self-hosted** conference service, deploy the current files from that rep
 - web/wolf_config.php.example — a template for a PRIVATE wolf_config.php
 - database/wolf_schema.sql — MySQL conference schema
 
-The current PHP implementation additionally depends on an allowed-server registry (wolfvoice_admin.servers), HTTPS, a shared existing voice credential key and tightly trusted simulators. Configure those for your own infrastructure; do not expose keys or use the obsolete prototype files web/conferences.php and database/schema.sql.
+For new independent deployments, configure the PHP API with `authorization_source = local` and `trusted_simulator_ips` set to your approved simulator egress IP addresses; this avoids any dependency on BloodMoon's admin database. HTTPS and the existing shared private voice credential are still required. BloodMoon's historical `bloodmoon_db` mode remains supported. Do not expose keys or use the obsolete prototype files web/conferences.php and database/schema.sql.
 
 On **EVERY participating simulator**, keep existing voice settings and configure ConferenceApiUrl in the [WebRtcVoice] section of wolfvoice.ini to the HTTPS URL of YOUR conference API. For example:
 
