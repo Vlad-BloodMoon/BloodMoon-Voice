@@ -26,7 +26,7 @@ Pour une nouvelle installation, sauvegarder les fichiers existants et installer 
 **Sur chaque simulateur** autorisé, ajouter dans `[WebRtcVoice]` (sans retirer les anciennes options) :
 
 ```ini
-ConferenceApiUrl = https://bloodmoonpack.com/adhocconf/wolf_api.php
+ConferenceApiUrl = https://conference.example.org/adhocconf/wolf_api.php
 ```
 
 Le service central BloodMoon vérifie les simulateurs autorisés et utilise des clés existantes partagées. Une installation indépendante doit disposer de sa **propre API**, de son propre serveur WolfVoice compatible et de son propre modèle de confiance.
