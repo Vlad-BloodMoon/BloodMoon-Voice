@@ -1,5 +1,7 @@
 # WolfVoice BloodMoon — téléchargements vérifiés
 
+**[Guide d'installation de l'ensemble serveur + DLL + API AdHoc](COMPLETE_STACK.md)** — serveur BloodMoon Voice v1.0.0, modules OpenSimulator **v0.9.3.1-webrtc.3 exclusivement**, et API PHP/MySQL du [dépôt indépendant des conférences](https://github.com/Vlad-BloodMoon/OpenSimulator-AdHocConferences). **La DLL régionale AdHoc est déjà incluse dans le pack .3 ; ne pas la remplacer par une plus ancienne.**
+
 **Version complète recommandée : `v0.2.0-bloodmoon.4` (serveur) + `v0.9.3.1-webrtc.3` (modules OpenSimulator 0.9.3.1 / .NET 8).**
 
 **Attention :** ces fonctionnalités ont été testées **sur le serveur WolfVoice modifié de BloodMoon**. Le serveur WolfVoice d'origine n'a pas encore tous nos correctifs des axes et fonctionnalités de groupe/conférence. Les conférences IM à plusieurs avatars nécessitent en plus l'API centrale PHP/MySQL BloodMoon. **Notre API hébergée n'est accessible qu'aux simulateurs autorisés** ; les clés ne sont jamais distribuées publiquement.
