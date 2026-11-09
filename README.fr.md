@@ -47,7 +47,7 @@ ConferenceApiUrl = https://conference.example.org/adhocconf/wolf_api.php
 
 **Ces deux adresses sont fictives et ne fonctionnent pas telles quelles.** Remplace `voice.example.org` par le vrai nom DNS de **ton serveur vocal** et `conference.example.org` par le domaine HTTPS où **tu as installé `wolf_api.php`**. **Cet exemple correspond au mode à deux clés du guide de nouvelle installation :** `RpcKeyFile` pour authentifier les requêtes des simulateurs et `CredKeyFile` pour les identifiants vocaux. Il faut réellement créer et distribuer les fichiers de clés selon le [guide français](docs/INSTALLATION_FR.md). **Les installations existantes fonctionnant avec une seule clé et une liste d’IP autorisées, comme BloodMoon, doivent conserver leur configuration actuelle sans ajouter ni régénérer de clé RPC.** L'URL `ConferenceApiUrl` doit être configurée sur **chaque simulateur** participant aux conférences inter-simulateurs.
 
-L'API de production BloodMoon n'est **pas un service public accessible sans autorisation**. Pour une installation indépendante, il faut déployer sa propre API PHP/MySQL et préparer son contrôle des serveurs autorisés (`wolfvoice_admin.servers` ou adaptation équivalente) ainsi que ses clés privées.
+L'API de production BloodMoon n'est **pas un service public accessible sans autorisation**. Pour une installation indépendante, déployer sa propre API PHP/MySQL, définir `authorization_source = local` et renseigner `trusted_simulator_ips` avec les IP publiques sortantes autorisées. **Aucune base `wolfvoice_admin.servers` n'est nécessaire dans ce mode.** Le mode `bloodmoon_db` reste disponible pour BloodMoon. Conserver ses propres clés privées.
 
 ## Installation complète : commencer ici
 
