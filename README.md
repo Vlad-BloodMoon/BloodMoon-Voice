@@ -16,6 +16,10 @@ The [BloodMoon Voice v1.0.0 release](https://github.com/Vlad-BloodMoon/BloodMoon
 
 **For new installations:** [download the BloodMoon Voice installer archive](https://github.com/Vlad-BloodMoon/BloodMoon-Voice/releases/download/v1.0.0/BloodMoon-Voice-installer-v1.0.0.tar.gz) and follow the [French guide](docs/INSTALLATION_FR.md) or [English guide](docs/INSTALLATION.md). The older `wolfvoice-installation-bloodmoon.4.tar.gz` is preserved as a historical archive and still contains original WolfVoice repository links. Do not assume the ZIP modules are present in the Git source tree.
 
+## Required matching repositories
+
+**[Complete three-project installation guide](docs/COMPLETE_STACK.md)** — The compatible OpenSimulator DLLs come **only** from [v0.9.3.1-webrtc.3](https://github.com/Vlad-BloodMoon/opensim/releases/tag/v0.9.3.1-webrtc.3). The independent [OpenSimulator-AdHocConferences](https://github.com/Vlad-BloodMoon/OpenSimulator-AdHocConferences) repository supplies the separate PHP/MySQL conference service. **Do not replace the matching regional DLL from the .3 ZIP with an older standalone AdHoc DLL.**
+
 ## Features and prerequisites
 
 The BloodMoon-modified voice stack supports spatial WebRTC voice, voice calls through private IM, and group/conference voice integrations when paired with compatible OpenSimulator modules. Complete ad-hoc multi-user IM conference functionality depends on the **separate BloodMoon PHP/MySQL conference API**, which is **not contained in this repository or the original source tree**. Do not treat this repository alone as a one-click complete conference deployment.
