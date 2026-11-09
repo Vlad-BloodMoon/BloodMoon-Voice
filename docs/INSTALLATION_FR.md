@@ -1,4 +1,4 @@
-# Installer WolfVoice sur sa propre grille — guide français
+# Installer BloodMoon Voice sur sa propre grille — guide français
 
 [Retour aux téléchargements](TELECHARGEMENTS_FR.md)
 
@@ -51,6 +51,10 @@ sudo ufw status
 Vérifier que 9443 reste fermé à ce stade, y compris sur le pare-feu de
 l'hébergeur. Si une ancienne règle l'ouvre déjà, la corriger avant de continuer.
 Ne pas activer ou réinitialiser UFW à distance sans préserver votre accès SSH.
+
+## Composants obligatoires pour les conférences AdHoc complètes
+
+**[Guide des trois dépôts et de leurs rôles](COMPLETE_STACK.md)** : utiliser le serveur [BloodMoon Voice v1.0.0](https://github.com/Vlad-BloodMoon/BloodMoon-Voice/releases/tag/v1.0.0), **uniquement les DLL/PDB de la release [OpenSimulator v0.9.3.1-webrtc.3](https://github.com/Vlad-BloodMoon/opensim/releases/tag/v0.9.3.1-webrtc.3)**, puis déployer séparément **l'API centrale PHP/MySQL** du dépôt [OpenSimulator-AdHocConferences](https://github.com/Vlad-BloodMoon/OpenSimulator-AdHocConferences) pour une grille auto-hébergée. La DLL régionale AdHoc est **déjà intégrée** dans la release .3 : **ne pas la remplacer par une ancienne DLL issue du dépôt AdHoc**. Il faut configurer ConferenceApiUrl sur chaque simulateur participant.
 
 ## 3. Installer le serveur vocal
 
