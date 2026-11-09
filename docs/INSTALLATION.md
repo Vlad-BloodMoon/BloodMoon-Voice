@@ -101,9 +101,7 @@ it takes precedence over the corresponding file. Keep one intentional source.
 
 ## 4. Transfer the SAME key to each authorized region host
 
-Transfer cred_key privately (SFTP/SCP or an equivalent secure channel). Do NOT
-generate a different key on each region. If relay authentication is enabled,
-transfer the existing rpc_key too.
+**For the new two-key installation in this guide, transfer BOTH `cred_key` and `rpc_key` privately** (SFTP/SCP or another secure channel). Do NOT generate different keys on each region. The existing one-key/IP-allowlist configuration is a separate legacy mode; do not apply this new-install procedure to a working server.
 
 On the REGION HOST, in the directory containing the transferred cred_key:
 replace opensim below with the actual user and group that run your simulator.
@@ -111,16 +109,12 @@ replace opensim below with the actual user and group that run your simulator.
 ```bash
 sudo install -d -o opensim -g opensim -m 750 /etc/opensim
 sudo install -o opensim -g opensim -m 600 cred_key /etc/opensim/voice_cred_key
-# Only when the server uses a relay key:
-# sudo install -o opensim -g opensim -m 600 rpc_key /etc/opensim/voice_rpc_key
+sudo install -o opensim -g opensim -m 600 rpc_key /etc/opensim/voice_rpc_key
 ```
 
 After confirming the transfer, remove temporary copies of the secrets.
 
-Alternative for an external host: put the administrator-supplied credential key
-in the simulator's bin/voice_cred_key and use CredKeyFile = voice_cred_key.
-The simulator must start with bin as its working directory, and its service
-account must be able to read the file. No .txt extension.
+Alternative for region hosts: place both administrator-supplied files in the simulator's `bin/` folder, named **`voice_rpc_key` and `voice_cred_key`**, then configure `RpcKeyFile = voice_rpc_key` and `CredKeyFile = voice_cred_key`. Start the simulator with `bin/` as its working directory and ensure the service account can read both. Do not add a `.txt` extension.
 
 ## 5. Configure the existing region INI
 
