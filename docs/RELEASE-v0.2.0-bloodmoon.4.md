@@ -33,7 +33,7 @@ The above has been validated on BloodMoon. These features have **not** been inde
 3. Add to the simulator's existing `[WebRtcVoice]` configuration:
 
    ```ini
-   ConferenceApiUrl = https://bloodmoonpack.com/adhocconf/wolf_api.php
+   ConferenceApiUrl = https://conference.example.org/adhocconf/wolf_api.php
    ```
 
 4. Restart the simulator and verify proximity voice, private voice, OpenSim group voice, a multi-avatar **text** conference and optional conference call.
