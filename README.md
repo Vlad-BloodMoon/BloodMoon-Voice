@@ -59,6 +59,6 @@ The standalone AdHoc PHP backend supports `authorization_source = local`, with t
 
 The [BloodMoon Voice v1.0.0 release](https://github.com/Vlad-BloodMoon/BloodMoon-Voice/releases/tag/v1.0.0) retains the production-derived server binary and provides the matching modules plus a new BloodMoon-specific installer archive. Historical release assets are retained for provenance; for a new install, choose **`BloodMoon-Voice-installer-v1.0.0.tar.gz`** instead of the older WolfVoice installer archive.
 
-To create your own derivative, use **Fork**, clone your fork and develop on your own branch. This repository's initial source snapshot matches [WolfVoice BloodMoon v0.2.0-bloodmoon.4](https://github.com/Vlad-BloodMoon/wolfvoice/releases/tag/v0.2.0-bloodmoon.4); it does not include all former GitHub issues or commit history.
+To create your own derivative, use **Fork**, clone your fork and develop on your own branch. This repository preserves the BloodMoon-specific source baseline from the former fork; historical GitHub issues and commit history were not migrated.
 
 **Attribution:** Based on [WolfVoice](https://github.com/intelligentwolf/wolfvoice) and the original WolfVoice contributors, including Lone Wolf / WolfGrid, with BloodMoon integration and testing. Preserve the included [LICENSE](LICENSE) and [NOTICE](NOTICE). The original README is [archived here](docs/ORIGINAL_WOLFVOICE_README.md).
